@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Spout">
+      <UniqueIdentifier>{92f91007-1b59-4e94-8d16-9ef40e6049b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpoutGL">
+      <UniqueIdentifier>{10d80528-c069-42e8-b052-6f2c2557db52}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="spout_JNISpout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Spout\SpoutControls.h">
+      <Filter>Spout</Filter>
+    </ClInclude>
+    <ClInclude Include="Spout\SpoutMemoryShare.h">
+      <Filter>Spout</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Spout.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutCommon.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutCopy.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutDirectX.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutFrameCount.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutGL.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutGLextensions.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutReceiver.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutSender.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutSenderNames.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutSharedMemory.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SpoutUtils.h">
+      <Filter>SpoutGL</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JSpoutLIB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Spout\SpoutControls.cpp">
+      <Filter>Spout</Filter>
+    </ClCompile>
+    <ClCompile Include="Spout\SpoutMemoryShare.cpp">
+      <Filter>Spout</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Spout.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SpoutCopy.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SpoutDirectX.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SpoutFrameCount.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SpoutGL.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SpoutGLextensions.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SpoutReceiver.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SpoutSender.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SpoutSenderNames.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SpoutSharedMemory.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SpoutUtils.cpp">
+      <Filter>SpoutGL</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
