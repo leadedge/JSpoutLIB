@@ -1,6 +1,6 @@
 /*
 
-        JNISpout.cpp : Defines the functions for the JNI dll used for the Processing Library
+        JSpoutLIB.cpp : Defines the functions for the JNI dll used for the Processing Library
 
 		This library is an interface between C++ and Java to create 
 		JNI dll files for use with the SpoutProcessing library project.
@@ -150,6 +150,8 @@
 				   Master updated from Beta Vers 2.007.007 - GitHub release 2.007h
 		25.02.22 - Remove checkReceiver
 		26.02.22 - readMemoryBuffer - Clear buffer for return if ReadMemoryBuffer is not successful
+		27.02.22 - Create GitHub repo
+				   Current SpoutGL files must be copied to the project "SpoutGL" folder.
 
 
 */
