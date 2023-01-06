@@ -5,7 +5,7 @@
 	Base class for OpenGL SpoutSDK
 	See also Sender and Receiver wrapper classes.
 
-	Copyright (c) 2021-2022, Lynn Jarvis. All rights reserved.
+	Copyright (c) 2021-2023, Lynn Jarvis. All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification, 
 	are permitted provided that the following conditions are met:
@@ -45,6 +45,10 @@
 #include <direct.h> // for _getcwd
 #include <TlHelp32.h> // for PROCESSENTRY32
 #include <tchar.h> // for _tcsicmp
+#include <algorithm> // for string character remove
+
+// 
+#pragma warning(disable : 26485)
 
 using namespace spoututils;
 
@@ -131,7 +135,7 @@ class SPOUT_DLLEXP spoutGL {
 	// Vertical sync status
 	int GetVerticalSync();
 	// Lock to monitor vertical sync
-	bool SetVerticalSync(bool bSync = true);
+	bool SetVerticalSync(int interval = 1);
 	// Get Spout version
 	int GetSpoutVersion();
 
@@ -180,7 +184,6 @@ class SPOUT_DLLEXP spoutGL {
 	bool CloseOpenGL();
 	// Class initialization status
 	bool IsSpoutInitialized();
-
 	// Perform tests for GL/DX interop availability and compatibility
 	bool GLDXready();
 	// Set host path to sender shared memory
@@ -327,6 +330,7 @@ protected :
 	void trim(char* s);
 
 	// Errors
+	void DoDiagnostics(const char *error);
 	void PrintFBOstatus(GLenum status);
 	bool GLerror();
 
@@ -340,12 +344,14 @@ protected :
 	unsigned int m_Width;
 	unsigned int m_Height;
 
-	// General
-	GLuint m_fbo; // Fbo used for OpenGL functions
+	// Utility
+	GLuint m_fbo; //  Fbo used for OpenGL functions
 	GLuint m_TexID; // Class texture used for invert copy
 	unsigned int m_TexWidth;
 	unsigned int m_TexHeight;
 	DWORD m_TexFormat;
+
+	// Shared texture
 	GLuint m_glTexture; // OpenGL shared texture
 	ID3D11Texture2D* m_pSharedTexture; // DirectX shared texture
 	HANDLE m_dxShareHandle; // DirectX shared texture handle
@@ -355,13 +361,15 @@ protected :
 	// GL/DX interop
 	HANDLE m_hInteropDevice; // Handle to the DX/GL interop device
 	HANDLE m_hInteropObject; // Handle to the DX/GL interop object (the shared texture)
+
+	// General
 	HWND m_hWnd; // OpenGL window
 	int m_SpoutVersion; // Spout version
 
 	// For CreateOpenGL and CloseOpenGL
-	HDC m_hdc = NULL;
-	HWND m_hwndButton = NULL;
-	HGLRC m_hRc = NULL;
+	HDC m_hdc;
+	HWND m_hwndButton;
+	HGLRC m_hRc;
 
 	// Status flags
 	bool m_bConnected;

@@ -25,7 +25,7 @@
 
 
 		- - - - - - - - - - - - - - - - - - - - - - - - - - 
-		Copyright (c) 2014-2022, Lynn Jarvis. All rights reserved.
+		Copyright (c) 2014-2023, Lynn Jarvis. All rights reserved.
 
 		Redistribution and use in source and binary forms, with or without modification, 
 		are permitted provided that the following conditions are met:
@@ -152,6 +152,14 @@
 		26.02.22 - readMemoryBuffer - Clear buffer for return if ReadMemoryBuffer is not successful
 		27.02.22 - Create GitHub repo
 				   Current SpoutGL files must be copied to the project "SpoutGL" folder.
+		26.03.22 - Change to VS2022, update SpoutGL files from VS2022 folder
+				   Rebuild Win32/x64 - VS2022 /MT
+		08.11.22 - Rebuild with updated SpoutGL files
+				   Retain Shared memory for SpoutControls
+		18.12.22 - Minor changes for code analysis (size_t/int)
+		26.12.22 - Update SpoutGL and SpoutControls files 
+		06.01.23 - Update SpoutGL to 2.007.009
+				   Rebuild x86/x64 - VS2022 /MT
 
 
 */
@@ -589,7 +597,9 @@ JNIEXPORT jint JNICALL Java_spout_JNISpout_checkControls
 			Value = env->GetFloatArrayElements(controlValue, &isCopy);
 
 			// Return names and text
-			for(int i=0; i<stringCount, i<(int)Controls.size(); i++) {
+			int mincount = min(stringCount, (int)Controls.size());
+			for (int i=0; i<mincount; i++) {
+			// for(int i=0; i<stringCount, i<(int)Controls.size(); i++) {
 				// Return the names
 				if(!Controls.at(i).name.empty()) {
 					jstring string = env->NewStringUTF(Controls.at(i).name.c_str());
@@ -784,12 +794,12 @@ JNIEXPORT jboolean JNICALL Java_spout_JNISpout_writeSenderString
 	if (spout->GetMemoryShareMode()) return false;
 
 	const char *nativestring = env->GetStringUTFChars(sValue, &isCopy);
-	size_t nbytes = strlen(nativestring);
+	int nbytes = (int)strlen(nativestring);
 	if (nativestring[0]) {
 
 		// Check the shared memory size
 		if (memoryshare.GetSenderMemorySize(width, height)) {
-			size_t memsize = (size_t)(width*height * 4); // RGBA
+			int memsize = (int)(width*height * 4); // RGBA
 			if (nbytes > memsize) nbytes = memsize;
 			// Lock memory and retrieve buffer pointer to write to
 			bufferout = memoryshare.LockSenderMemory();
@@ -954,7 +964,7 @@ JNIEXPORT jstring JNICALL Java_spout_JNISpout_readMemoryBuffer
 	jstring jstrSenderBuffer = env->NewStringUTF(senderbuffer);
 	
 	// Done with the char array
-	delete senderbuffer;
+	delete[] senderbuffer;
 	
 	env->ReleaseStringUTFChars(bufferName, nativename);
 
@@ -1398,17 +1408,6 @@ JNIEXPORT jint JNICALL Java_spout_JNISpout_getTextureID
 	Spout * spout = (Spout *)ptr;
 	return spout->GetSharedTextureID();
 
-}
-
-// set adapter for Spout output
-JNIEXPORT jboolean JNICALL Java_spout_JNISpout_setAdapter
-(JNIEnv *env, jclass c, jint index, jlong ptr)
-{
-	UNREFERENCED_PARAMETER(c);
-	UNREFERENCED_PARAMETER(env);
-
-	Spout * spout = (Spout *)ptr;
-	return spout->SetAdapter(index);
 }
 
 //

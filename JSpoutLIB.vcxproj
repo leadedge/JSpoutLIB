@@ -22,34 +22,34 @@
     <ProjectGuid>{6CA0D801-31B3-4233-A73E-2A7F50008C1D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>JSpout</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -136,7 +136,6 @@
 
 
 
-
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -171,34 +170,23 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Spout.h" />
-    <ClInclude Include="..\..\SpoutCommon.h" />
-    <ClInclude Include="..\..\SpoutCopy.h" />
-    <ClInclude Include="..\..\SpoutDirectX.h" />
-    <ClInclude Include="..\..\SpoutFrameCount.h" />
-    <ClInclude Include="..\..\SpoutGL.h" />
-    <ClInclude Include="..\..\SpoutGLextensions.h" />
-    <ClInclude Include="..\..\SpoutReceiver.h" />
-    <ClInclude Include="..\..\SpoutSender.h" />
-    <ClInclude Include="..\..\SpoutSenderNames.h" />
-    <ClInclude Include="..\..\SpoutSharedMemory.h" />
-    <ClInclude Include="..\..\SpoutUtils.h" />
+    <ClInclude Include="SpoutGL\Spout.h" />
+    <ClInclude Include="SpoutGL\SpoutCommon.h" />
+    <ClInclude Include="SpoutGL\SpoutCopy.h" />
+    <ClInclude Include="SpoutGL\SpoutDirectX.h" />
+    <ClInclude Include="SpoutGL\SpoutFrameCount.h" />
+    <ClInclude Include="SpoutGL\SpoutGL.h" />
+    <ClInclude Include="SpoutGL\SpoutGLextensions.h" />
+    <ClInclude Include="SpoutGL\SpoutReceiver.h" />
+    <ClInclude Include="SpoutGL\SpoutSender.h" />
+    <ClInclude Include="SpoutGL\SpoutSenderNames.h" />
+    <ClInclude Include="SpoutGL\SpoutSharedMemory.h" />
+    <ClInclude Include="SpoutGL\SpoutUtils.h" />
     <ClInclude Include="Spout\SpoutControls.h" />
     <ClInclude Include="Spout\SpoutMemoryShare.h" />
     <ClInclude Include="spout_JNISpout.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Spout.cpp" />
-    <ClCompile Include="..\..\SpoutCopy.cpp" />
-    <ClCompile Include="..\..\SpoutDirectX.cpp" />
-    <ClCompile Include="..\..\SpoutFrameCount.cpp" />
-    <ClCompile Include="..\..\SpoutGL.cpp" />
-    <ClCompile Include="..\..\SpoutGLextensions.cpp" />
-    <ClCompile Include="..\..\SpoutReceiver.cpp" />
-    <ClCompile Include="..\..\SpoutSender.cpp" />
-    <ClCompile Include="..\..\SpoutSenderNames.cpp" />
-    <ClCompile Include="..\..\SpoutSharedMemory.cpp" />
-    <ClCompile Include="..\..\SpoutUtils.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
@@ -215,6 +203,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SpoutGL\Spout.cpp" />
+    <ClCompile Include="SpoutGL\SpoutCopy.cpp" />
+    <ClCompile Include="SpoutGL\SpoutDirectX.cpp" />
+    <ClCompile Include="SpoutGL\SpoutFrameCount.cpp" />
+    <ClCompile Include="SpoutGL\SpoutGL.cpp" />
+    <ClCompile Include="SpoutGL\SpoutGLextensions.cpp" />
+    <ClCompile Include="SpoutGL\SpoutReceiver.cpp" />
+    <ClCompile Include="SpoutGL\SpoutSender.cpp" />
+    <ClCompile Include="SpoutGL\SpoutSenderNames.cpp" />
+    <ClCompile Include="SpoutGL\SpoutSharedMemory.cpp" />
+    <ClCompile Include="SpoutGL\SpoutUtils.cpp" />
     <ClCompile Include="Spout\SpoutControls.cpp" />
     <ClCompile Include="Spout\SpoutMemoryShare.cpp" />
   </ItemGroup>

@@ -2,7 +2,7 @@
 
 This library is an interface between C++ and Java to create JNI (Java Native Interface) dll files for use with the [SpoutProcessing](https://github.com/leadedge/SpoutProcessing) library project.
 
-The Visual Studio 2017 project produces "JSpoutLIB.dll". 64 bit and 32 bit output files are copied as "JNISpout_64.lib" and "JNISpout_32.lib" respectively to the "Binaries" folder. These should be copied to the "eclipse-workspace\spout\lib\" folder. Refer to "SETUP.md" in the the SpoutProcessing repository.
+The Visual Studio 2022 project produces "JSpoutLIB.dll". 64 bit and 32 bit output files are copied as "JNISpout_64.lib" and "JNISpout_32.lib" respectively to the "Binaries" folder. These should be copied to the "eclipse-workspace\spout\lib\" folder. Refer to "SETUP.md" in the the SpoutProcessing repository.
 
 The header file "spout.JNISpout.h" is produced by the SpoutProcessing Eclipse project from definitions in "JNISpout.java". If "JNISpout.java" is ever changed, the modified file must be used.
 

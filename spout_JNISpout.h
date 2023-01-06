@@ -257,14 +257,6 @@ JNIEXPORT jint JNICALL Java_spout_JNISpout_getShareMode
 
 /*
  * Class:     spout_JNISpout
- * Method:    setAdapter
- * Signature: (IJ)Z
- */
-JNIEXPORT jboolean JNICALL Java_spout_JNISpout_setAdapter
-  (JNIEnv *, jclass, jint, jlong);
-
-/*
- * Class:     spout_JNISpout
  * Method:    createControl
  * Signature: (Ljava/lang/String;Ljava/lang/String;FFFLjava/lang/String;J)Z
  */

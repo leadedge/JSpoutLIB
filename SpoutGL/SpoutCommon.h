@@ -12,7 +12,7 @@
 		Thanks and credit to Malcolm Bechard, the author of this file
 		https://github.com/mbechard
 
-		Copyright (c) 2014-2022, Lynn Jarvis. All rights reserved.
+		Copyright (c) 2014-2023, Lynn Jarvis. All rights reserved.
 
 		Redistribution and use in source and binary forms, with or without modification, 
 		are permitted provided that the following conditions are met:
@@ -40,8 +40,11 @@
 
 #ifndef __SpoutCommon__
 #define __SpoutCommon__
+
 //
-// For build of the Spout library as a dll
+// To build the Spout library as a dll, define
+// SPOUT_BUILD_DLL in the preprocessor defines.
+// Properties > C++ > Preprocessor > Preprocessor Definitions
 //
 #if defined(_MSC_VER)
 	#if defined(SPOUT_BUILD_DLL)
@@ -55,6 +58,9 @@
 	#define SPOUT_DLLEXP
 #endif // _MSC_VERR
 
+// Common utility functions namespace
+#include "SpoutUtils.h"
+
 //
 // This definition enables legacy OpenGL rendering code
 // used for shared texture Draw functions in SpoutGLDXinterop.cpp
@@ -66,7 +72,12 @@
 // #define legacyOpenGL
 //
 
-// Common utility functions namespace
-#include "SpoutUtils.h"
+//
+// Visual Studio code analysis warnings
+//
+
+// C++11 scoped (class) enums are not compatible with early compilers (< VS2012 and others).
+// The warning is designated "Prefer" and "C" standard unscoped enums are retained for compatibility.
+#pragma warning(disable:26812) // unscoped enums
 
 #endif

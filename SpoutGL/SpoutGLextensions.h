@@ -24,7 +24,7 @@
 //
 /*
 
-	Copyright (c) 2014-2022, Lynn Jarvis. All rights reserved.
+	Copyright (c) 2014-2023, Lynn Jarvis. All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without modification, 
 	are permitted provided that the following conditions are met:
@@ -93,6 +93,7 @@
 // For use together with Spout source files
 #include "SpoutCommon.h" // for legacyOpenGL define
 #include "SpoutUtils.h"
+#include <stdint.h> // for _uint32 etc
 
 using namespace spoututils;
 
@@ -141,14 +142,14 @@ using namespace spoututils;
 //
 // Spout compatible Log levels
 //
-enum LogLevel {
-	LOG_SILENT,
-	LOG_VERBOSE,
-	LOG_NOTICE,
-	LOG_WARNING,
-	LOG_ERROR,
-	LOG_FATAL,
-	LOG_NONE,
+enum ExtLogLevel {
+	SPOUT_EXT_LOG_SILENT,
+	SPOUT_EXT_LOG_VERBOSE,
+	SPOUT_EXT_LOG_NOTICE,
+	SPOUT_EXT_LOG_WARNING,
+	SPOUT_EXT_LOG_ERROR,
+	SPOUT_EXT_LOG_FATAL,
+	SPOUT_EXT_LOG_NONE
 };
 
 
@@ -332,6 +333,7 @@ extern PFNWGLDXUNLOCKOBJECTSNVPROC			wglDXUnlockObjectsNV;
 typedef void   (APIENTRY *glBindFramebufferEXTPROC)			(GLenum target, GLuint framebuffer);
 typedef void   (APIENTRY *glBindRenderbufferEXTPROC)		(GLenum target, GLuint renderbuffer);
 typedef GLenum (APIENTRY *glCheckFramebufferStatusEXTPROC)	(GLenum target);
+typedef GLenum (APIENTRY* glCheckNamedFramebufferStatusEXTPROC)	(GLuint framebuffer, GLenum target);
 typedef void   (APIENTRY *glDeleteFramebuffersEXTPROC)		(GLsizei n, const GLuint* framebuffers);
 typedef void   (APIENTRY *glDeleteRenderBuffersEXTPROC)		(GLsizei n, const GLuint* renderbuffers);
 typedef void   (APIENTRY *glFramebufferRenderbufferEXTPROC) (GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
@@ -350,6 +352,7 @@ typedef void (APIENTRY *glRenderbufferStorageEXTPROC)		(GLenum target, GLenum in
 extern glBindFramebufferEXTPROC						glBindFramebufferEXT;
 extern glBindRenderbufferEXTPROC					glBindRenderbufferEXT;
 extern glCheckFramebufferStatusEXTPROC				glCheckFramebufferStatusEXT;
+extern glCheckNamedFramebufferStatusEXTPROC			glCheckNamedFramebufferStatusEXT;
 extern glDeleteFramebuffersEXTPROC					glDeleteFramebuffersEXT;
 extern glDeleteRenderBuffersEXTPROC					glDeleteRenderBuffersEXT;
 extern glFramebufferRenderbufferEXTPROC				glFramebufferRenderbufferEXT;
@@ -572,6 +575,6 @@ bool loadPBOextensions();
 bool loadCopyExtensions();
 bool loadContextExtension();
 bool isExtensionSupported(const char *extension);
-void ExtLog(LogLevel level, const char* format, ...);
+void ExtLog(ExtLogLevel level, const char* format, ...);
 
 #endif // end __spoutGLextensions__
