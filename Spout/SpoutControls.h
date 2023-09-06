@@ -64,11 +64,11 @@ struct filecontrol {
 					// "point2D"
 					// "color"
 					// "image"
-	int    fftype;  // freeframe parameter type - 0 - 6, 10, 100
-	float  def;     // default float value
-	float  value;   // user float value
-	float  min;		// Minimum
-	float  max;		// Maximum
+	int    fftype = 0;  // freeframe parameter type - 0 - 6, 10, 100
+	float  def = 0.0f;     // default float value
+	float  value = 0.0f;   // user float value
+	float  min = 0.0f;		// Minimum
+	float  max = 0.0f;		// Maximum
 	std::string text;	// text value
 	// TODO deftext
 };
@@ -77,8 +77,8 @@ struct filecontrol {
 
 struct control {
     std::string name;
-    int type; // 0-checkbox, 1-button, 10-float, 100-string
-    float value;
+    int type = 0; // 0-checkbox, 1-button, 10-float, 100-string
+    float value = 0;
     std::string text;
 };
 
@@ -97,7 +97,7 @@ class SPOUT_DLLEXP SpoutControls {
 	void CloseMap();
 
 	bool FindControlFile (std::string &filepath);
-	bool CopyControlFile (std::string &filepath, std::string &destpath);
+	bool CopyControlFile (const std::string &filepath, std::string &destpath);
 
 	// The sender being controlled
 	bool CreateControl(std::string name, std::string type);

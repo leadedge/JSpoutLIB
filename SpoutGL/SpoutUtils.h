@@ -44,6 +44,8 @@
 #include <string>
 #include <Shellapi.h> // for shellexecute
 #include <shlwapi.h> // for path functions
+#include <Commctrl.h> // For TaskDialogIndirect
+
 
 //
 // C++11 timer is only available for MS Visual Studio 2015 and above.
@@ -67,6 +69,12 @@
 #pragma comment(lib, "shlwapi.lib") // for path functions
 #pragma comment(lib, "Advapi32.lib") // for registry functions
 #pragma comment(lib, "Version.lib") // for version resources where necessary
+#pragma comment(lib, "Comctl32.lib") // For taskdialog
+
+// https://learn.microsoft.com/en-us/windows/win32/controls/cookbook-overview
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 // SpoutUtils
 namespace spoututils {
@@ -87,7 +95,6 @@ namespace spoututils {
 		// Ignore log levels
 		SPOUT_LOG_NONE
 	};
-
 
 	//
 	// Information
@@ -114,7 +121,7 @@ namespace spoututils {
 	// Close console window.
 	// The optional warning displays a MessageBox if user notification is required.
 	void SPOUT_DLLEXP CloseSpoutConsole(bool bWarning = false);
-	
+
 	// Enable logging to the console.
 	// Logs are displayed in a console window.  
 	// Useful for program development.
@@ -154,11 +161,11 @@ namespace spoututils {
 	// Is file logging enabled
 	bool SPOUT_DLLEXP LogFileEnabled();
 
-	// Return the log file as a string
-	std::string SPOUT_DLLEXP GetSpoutLog(const char* filepath = nullptr);
-
 	// Return the full log file path
 	std::string SPOUT_DLLEXP GetSpoutLogPath();
+
+	// Return the log file as a string
+	std::string SPOUT_DLLEXP GetSpoutLog(const char* filepath = nullptr);
 
 	// Show the log file folder in Windows Explorer
 	void SPOUT_DLLEXP ShowSpoutLogs();
@@ -187,6 +194,9 @@ namespace spoututils {
 	// Logging function.
 	void SPOUT_DLLEXP _doLog(SpoutLogLevel level, const char* format, va_list args);
 
+	// Print to console (printf replacement)
+	int SPOUT_DLLEXP _conprint(const char* format, ...);
+
 	//
 	// MessageBox dialog
 	//
@@ -195,11 +205,20 @@ namespace spoututils {
 	// Used where a Windows MessageBox would interfere with the application GUI.  
 	// The dialog closes itself if a timeout is specified.
 	int SPOUT_DLLEXP SpoutMessageBox(const char * message, DWORD dwMilliseconds = 0);
+
+	// MessageBox with variable arguments
+	int SPOUT_DLLEXP SpoutMessageBox(const char * caption, const char* format, ...);
 	
 	// MessageBox dialog with standard arguments.
 	// Replaces an existing MessageBox call.
 	int SPOUT_DLLEXP SpoutMessageBox(HWND hwnd, LPCSTR message, LPCSTR caption, UINT uType, DWORD dwMilliseconds = 0);
-	
+
+	// Custom icon for SpoutMessageBox from resources
+	void SPOUT_DLLEXP SpoutMessageBoxIcon(HICON hIcon);
+
+	// Custom icon for SpoutMessageBox from file
+	bool SPOUT_DLLEXP SpoutMessageBoxIcon(std::string iconfile);
+
 	//
 	// Registry utilities
 	//
@@ -247,10 +266,9 @@ namespace spoututils {
 #ifdef USE_CHRONO
 	// Microseconds elapsed since epoch
 	double SPOUT_DLLEXP ElapsedMicroseconds();
-#else
+#endif
 	void SPOUT_DLLEXP StartCounter();
 	double SPOUT_DLLEXP GetCounter();
-#endif
 
 	//
 	// Private functions
@@ -268,6 +286,15 @@ namespace spoututils {
 		bool SetNVIDIAmode(const char *command, int mode);
 		bool ExecuteProcess(const char *path);
 
+		int SPOUT_DLLEXP MessageTaskDialog(HINSTANCE hInst, const char* content, const char* caption, DWORD dwButtons, DWORD dwMilliseconds);
+		// TaskDialogIndirect callback to handle timer, topmost and hyperlinks
+		HRESULT TDcallbackProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR lpRefData);
+		// For topmost
+		HWND TaskHwnd = NULL;
+		HWND hwndTop = NULL;
+		bool bTopMost = false;
+		// For custom icon
+		HICON hTaskIcon = NULL;
 	}
 
 }

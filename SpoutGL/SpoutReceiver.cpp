@@ -72,7 +72,12 @@
 //		01.11.22	- Add SetPreferredAdapter
 //		03.11.22	- Add IsPreferenceAvailable
 //		07.11.22	- Add IsApplicationPath
-//		14.12.23	- Remove SetAdapter. Requires OpenGL setup.
+//		14.12.22	- Remove SetAdapter. Requires OpenGL setup.
+// Version 2.007.11
+//		06.07.23	- Remove bUseActive from 2.006 CreateReceiver
+//	Version 2.007.012
+//		04.08.23	- Add format functions
+//		07.08.23	- Add frame sync option functions
 //
 // ====================================================================================
 //
@@ -285,6 +290,18 @@ void SpoutReceiver::SetFrameSync(const char* SenderName)
 bool SpoutReceiver::WaitFrameSync(const char *SenderName, DWORD dwTimeout)
 {
 	return spout.WaitFrameSync(SenderName, dwTimeout);
+}
+
+//---------------------------------------------------------
+void SpoutReceiver::EnableFrameSync(bool bSync)
+{
+	spout.EnableFrameSync(bSync);
+}
+
+//---------------------------------------------------------
+bool SpoutReceiver::IsFrameSyncEnabled()
+{
+	return spout.IsFrameSyncEnabled();
 }
 
 //---------------------------------------------------------
@@ -611,14 +628,56 @@ bool SpoutReceiver::CopyTexture(GLuint SourceID, GLuint SourceTarget,
 		width, height, bInvert, HostFBO);
 }
 
+
+//
+// Formats
+//
+
+//---------------------------------------------------------
+DXGI_FORMAT SpoutReceiver::GetDX11format()
+{
+	return spout.GetDX11format();
+}
+
+//---------------------------------------------------------
+void SpoutReceiver::SetDX11format(DXGI_FORMAT textureformat)
+{
+	spout.SetDX11format(textureformat);
+}
+
+//---------------------------------------------------------
+DXGI_FORMAT SpoutReceiver::DX11format(GLint glformat)
+{
+	return spout.DX11format(glformat);
+}
+
+//---------------------------------------------------------
+GLint SpoutReceiver::GLDXformat(DXGI_FORMAT textureformat)
+{
+	return spout.GLDXformat(textureformat);
+}
+
+//---------------------------------------------------------
+GLint SpoutReceiver::GLformat(GLuint TextureID, GLuint TextureTarget)
+{
+	return spout.GLformat(TextureID, TextureTarget);
+}
+
+//---------------------------------------------------------
+std::string SpoutReceiver::GLformatName(GLint glformat)
+{
+	return spout.GLformatName(glformat);
+}
+
+
 //
 // 2.006 compatibility
 //
 
 //---------------------------------------------------------
-bool SpoutReceiver::CreateReceiver(char* sendername, unsigned int &width, unsigned int &height, bool bUseActive)
+bool SpoutReceiver::CreateReceiver(char* sendername, unsigned int &width, unsigned int &height)
 {
-	return spout.CreateReceiver(sendername, width, height, bUseActive);
+	return spout.CreateReceiver(sendername, width, height);
 }
 
 //---------------------------------------------------------

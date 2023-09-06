@@ -46,7 +46,10 @@
 //	14.04.22 - Add option in SpoutCommon.h to disable warning 26812 (unscoped enums).
 //	28.10.22 - Code documentation
 //  18.12.22 - Catch any exception from using Close in destructor
-//
+//	07.01.23 - Change m_pName from const char* to char* for strdup
+//  Version 2.007.11
+//  12.05.23 - Create and Open - Clear ERROR_ALREADY_EXISTS to avoid detection elsewhere.
+//	Version 2.007.012
 // ====================================================================================
 
 
@@ -121,6 +124,8 @@ SpoutCreateResult SpoutSharedMemory::Create(const char* name, int size)
 	bool alreadyExists = false;
 	if (err == ERROR_ALREADY_EXISTS) {
 		alreadyExists = true;
+		// Clear the error to avoid detection elsewhere.
+		SetLastError(NO_ERROR);
 		// The size of the map will be the same as when it was created.
 		// 2.004 apps will have created a 10 sender map which will not be increased in size thereafter.
 	}
@@ -153,6 +158,7 @@ SpoutCreateResult SpoutSharedMemory::Create(const char* name, int size)
 
 	// Set the name and size
 	m_pName = _strdup(name);
+
 	m_size = size;
 
 	return alreadyExists ? SPOUT_ALREADY_EXISTS : SPOUT_CREATE_SUCCESS;
@@ -174,7 +180,7 @@ bool SpoutSharedMemory::Open(const char* name)
 	}
 
 	m_hMap = OpenFileMappingA(FILE_MAP_ALL_ACCESS, false, (LPCSTR)name);
-	if (m_hMap == NULL)	{
+	if (m_hMap == NULL) {
 		return false;
 	}
 
@@ -194,7 +200,13 @@ bool SpoutSharedMemory::Open(const char* name)
 		return false;
 	}
 
+	// If the mutex object existed before this function call,
+	// GetLastError returns ERROR_ALREADY_EXISTS. 
+	// Clear the error to avoid detection elsewhere.
+	SetLastError(NO_ERROR);
+
 	m_pName = _strdup(name);
+
 	// OpenFileMapping/MapViewOfFile do not return the map size
 	// Only the process that creates the shared memory can save it's size.
 	m_size = 0;

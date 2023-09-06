@@ -38,7 +38,26 @@
 //			18.04.22	- Add glCheckNamedFramebufferStatus
 //			17.12.22	- Some cleanup for code analysis
 //			22.12.22	- Compiler compatibility check
-//
+//			20.01.23	- Changes to gl definitions for compatibility with Glew
+//			15.02.23	- SpoutGLextensions.h
+//						  Correct glUnmapBufferPROC from void to GLboolean
+//						  Correct glGenBuffersPROC buffers arg from const
+// Version 2.007.11
+//			20.04.23	- Add compute shader extensions
+//			22.04.23	- Correct EXT_LOG prefixe for standalone in ExtLog function
+//			24.04.23	- Add glGetTexParameteriv and glTextureStorage2D
+//			04.05.23	- Define GL_BGRA in case it is used
+//			09.05.23	- Add memory object extensions
+//			16.06.23	- Add glTextureStorageMem2DEXT
+//			24.06.23	- Add glUniform1f
+//			14.07.23	- Add glMemoryBarrier
+//			21.07.23	- Add glGetMemoryObjectParameterivEXT
+//	Version 2.007.012
+//			24.07.23	- Add glMemoryObjectParameterivEXT
+//			30.07.23	- Add GL_RGBA16F, GL_RGB16F, GL_RGBA32F, GL_RGB32F
+//			31.07.23	- Add defines
+//						  GL_IMPLEMENTATION_COLOR_READ_TYPE, GL_IMPLEMENTATION_COLOR_READ_FORMAT
+//			02.08.23	- Add glGetTextureParameteriv
 
 	Copyright (c) 2014-2023, Lynn Jarvis. All rights reserved.
 
@@ -68,6 +87,8 @@
 #ifndef USE_GLEW
 
 // GL/DX extensions
+// https://registry.khronos.org/OpenGL/extensions/NV/WGL_NV_DX_interop.txt
+// https://registry.khronos.org/OpenGL/extensions/NV/WGL_NV_DX_interop2.txt
 PFNWGLDXOPENDEVICENVPROC				wglDXOpenDeviceNV				= NULL;
 PFNWGLDXREGISTEROBJECTNVPROC			wglDXRegisterObjectNV			= NULL;
 PFNWGLDXSETRESOURCESHAREHANDLENVPROC	wglDXSetResourceShareHandleNV	= NULL;
@@ -109,19 +130,21 @@ PFNWGLGETSWAPINTERVALEXTPROC			wglGetSwapIntervalEXT			= NULL;
 
 // PBO extensions
 #ifdef USE_PBO_EXTENSIONS
-glGenBuffersPROC						glGenBuffersEXT					= NULL;
-glDeleteBuffersPROC						glDeleteBuffersEXT				= NULL;
-glBindBufferPROC						glBindBufferEXT					= NULL;
-glBufferDataPROC						glBufferDataEXT					= NULL;
-glBufferStoragePROC						glBufferStorageEXT				= NULL;
-glMapBufferPROC							glMapBufferEXT					= NULL;
+glGenBuffersPROC						glGenBuffers					= NULL;
+glDeleteBuffersPROC						glDeleteBuffers					= NULL;
+glBindBufferPROC						glBindBuffer					= NULL;
+glBufferDataPROC						glBufferData					= NULL;
+glBufferStoragePROC						glBufferStorage					= NULL;
+glMapBufferPROC							glMapBuffer						= NULL;
 // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glMapBufferRange.xhtml
-glMapBufferRangePROC					glMapBufferRangeEXT				= NULL;
-glUnmapBufferPROC						glUnmapBufferEXT				= NULL;
-glGetBufferParameterivPROC				glGetBufferParameterivEXT		= NULL;
-glClientWaitSyncPROC					glClientWaitSyncEXT				= NULL;
-glDeleteSyncPROC						glDeleteSyncEXT					= NULL;
-glFenceSyncPROC							glFenceSyncEXT					= NULL;
+glMapBufferRangePROC					glMapBufferRange				= NULL;
+glUnmapBufferPROC						glUnmapBuffer					= NULL;
+glGetBufferParameterivPROC				glGetBufferParameteriv			= NULL;
+// Could be separated
+glGetTextureParameterivPROC             glGetTextureParameteriv         = NULL;
+glClientWaitSyncPROC					glClientWaitSync				= NULL;
+glDeleteSyncPROC						glDeleteSync					= NULL;
+glFenceSyncPROC							glFenceSync						= NULL;
 
 #endif
 
@@ -132,8 +155,42 @@ glFenceSyncPROC							glFenceSyncEXT					= NULL;
 #ifdef USE_COPY_EXTENSIONS
 PFNGLCOPYIMAGESUBDATAPROC glCopyImageSubData = NULL;
 glGetInternalFormativPROC glGetInternalFormativ = NULL;
-
 #endif
+
+//---------------------------
+// (for future use)
+// Compute shader extensions
+//---------------------------
+glCreateProgramPROC		 glCreateProgram    = NULL;
+glCreateShaderPROC       glCreateShader     = NULL;
+glShaderSourcePROC       glShaderSource     = NULL;
+glCompileShaderPROC      glCompileShader    = NULL;
+glAttachShaderPROC       glAttachShader     = NULL;
+glLinkProgramPROC        glLinkProgram      = NULL;
+glGetProgramivPROC       glGetProgramiv     = NULL;
+glDetachShaderPROC       glDetachShader     = NULL;
+glUseProgramPROC         glUseProgram       = NULL;
+glBindImageTexturePROC   glBindImageTexture = NULL;
+glDispatchComputePROC    glDispatchCompute  = NULL;
+glDeleteProgramPROC      glDeleteProgram    = NULL;
+glDeleteShaderPROC       glDeleteShader     = NULL;
+glMemoryBarrierPROC      glMemoryBarrier    = NULL;
+glActiveTexturePROC      glActiveTexture    = NULL;
+glUniform1iPROC          glUniform1i        = NULL;
+glUniform1fPROC          glUniform1f        = NULL;
+glGetUniformLocationPROC glGetUniformLocation = NULL;
+glTextureStorage2DPROC   glTextureStorage2D  = NULL;
+glCreateTexturesPROC     glCreateTextures    = NULL;
+
+glCreateMemoryObjectsEXTPROC      glCreateMemoryObjectsEXT = NULL;
+glDeleteMemoryObjectsEXTPROC      glDeleteMemoryObjectsEXT = NULL;
+glTexStorageMem2DEXTPROC          glTexStorageMem2DEXT = NULL;
+glTextureStorageMem2DEXTPROC      glTextureStorageMem2DEXT = NULL;
+glImportMemoryWin32HandleEXTPROC  glImportMemoryWin32HandleEXT = NULL;
+glBufferStorageMemEXTPROC         glBufferStorageMemEXT = NULL;
+glMemoryObjectParameterivEXTPROC  glMemoryObjectParameterivEXT;
+glGetMemoryObjectParameterivEXTPROC glGetMemoryObjectParameterivEXT = NULL;
+
 
 //---------------------------
 // Context creation extension
@@ -315,32 +372,33 @@ bool loadPBOextensions()
 	else
 		return false;
 	#else
-	glGenBuffersEXT	    = (glGenBuffersPROC)wglGetProcAddress("glGenBuffers");
-	glDeleteBuffersEXT  = (glDeleteBuffersPROC)wglGetProcAddress("glDeleteBuffers");
-	glBindBufferEXT	    = (glBindBufferPROC)wglGetProcAddress("glBindBuffer");
-	glBufferDataEXT	    = (glBufferDataPROC)wglGetProcAddress("glBufferData");
-	glBufferStorageEXT	= (glBufferStoragePROC)wglGetProcAddress("glBufferStorage");
-	glMapBufferEXT      = (glMapBufferPROC)wglGetProcAddress("glMapBuffer");
-	glMapBufferRangeEXT = (glMapBufferRangePROC)wglGetProcAddress("glMapBufferRange");
-	glUnmapBufferEXT    = (glUnmapBufferPROC)wglGetProcAddress("glUnmapBuffer");
-	glGetBufferParameterivEXT = (glGetBufferParameterivPROC)wglGetProcAddress("glGetBufferParameteriv");
-	glClientWaitSyncEXT = (glClientWaitSyncPROC)wglGetProcAddress("glClientWaitSync");
-	glDeleteSyncEXT     = (glDeleteSyncPROC)wglGetProcAddress("glDeleteSync");
-	glFenceSyncEXT      = (glFenceSyncPROC)wglGetProcAddress("glFenceSync");
+	glGenBuffers	    = (glGenBuffersPROC)wglGetProcAddress("glGenBuffers");
+	glDeleteBuffers		= (glDeleteBuffersPROC)wglGetProcAddress("glDeleteBuffers");
+	glBindBuffer	    = (glBindBufferPROC)wglGetProcAddress("glBindBuffer");
+	glBufferData	    = (glBufferDataPROC)wglGetProcAddress("glBufferData");
+	glBufferStorage		= (glBufferStoragePROC)wglGetProcAddress("glBufferStorage");
+	glMapBuffer			= (glMapBufferPROC)wglGetProcAddress("glMapBuffer");
+	glMapBufferRange	= (glMapBufferRangePROC)wglGetProcAddress("glMapBufferRange");
+	glUnmapBuffer		= (glUnmapBufferPROC)wglGetProcAddress("glUnmapBuffer");
+	glGetBufferParameteriv = (glGetBufferParameterivPROC)wglGetProcAddress("glGetBufferParameteriv");
+	glGetTextureParameteriv = (glGetTextureParameterivPROC)wglGetProcAddress("glGetTextureParameteriv");
+	glClientWaitSync	= (glClientWaitSyncPROC)wglGetProcAddress("glClientWaitSync");
+	glDeleteSync		= (glDeleteSyncPROC)wglGetProcAddress("glDeleteSync");
+	glFenceSync			= (glFenceSyncPROC)wglGetProcAddress("glFenceSync");
 
-	if(glGenBuffersEXT  != NULL && glDeleteBuffersEXT  != NULL
-	&& glBindBufferEXT  != NULL && glBufferDataEXT     != NULL
-	&& glBufferStorageEXT != NULL && glMapBufferEXT   != NULL
-	&& glMapBufferRangeEXT != NULL && glUnmapBufferEXT != NULL
-	&& glGetBufferParameterivEXT != NULL
-	&& glClientWaitSyncEXT != NULL && glDeleteSyncEXT != NULL && glFenceSyncEXT != NULL) {
+	if (glGenBuffers  != NULL && glDeleteBuffers  != NULL
+		&& glBindBuffer  != NULL && glBufferData     != NULL
+		&& glBufferStorage != NULL && glMapBuffer   != NULL
+		&& glMapBufferRange != NULL && glUnmapBuffer != NULL
+		&& glGetBufferParameteriv != NULL && glGetTextureParameteriv != NULL
+		&& glClientWaitSync != NULL && glDeleteSync != NULL && glFenceSync != NULL) {
 		return true;
 	}
 	else {
 		ExtLog(SPOUT_EXT_LOG_WARNING, "loadPBOextensions() fail");
 		return false;
 	}
-	#endif
+#endif
 
 #else
 	// PBO extensions defined elsewhere
@@ -364,9 +422,7 @@ bool loadCopyExtensions()
 
 	// Copy extensions
 	glCopyImageSubData = (PFNGLCOPYIMAGESUBDATAPROC)wglGetProcAddress("glCopyImageSubData");
-
 	glGetInternalFormativ = (glGetInternalFormativPROC)wglGetProcAddress("glGetInternalFormativ");
-
 	if (glCopyImageSubData != NULL) {
 		return true;
 	}
@@ -382,6 +438,92 @@ bool loadCopyExtensions()
 
 }
 
+
+bool loadComputeShaderExtensions()
+{
+
+#ifdef USE_COMPUTE_EXTENSIONS
+
+	#ifdef USE_GLEW
+	   return false;
+	#else
+
+	// Compute shader extensions
+	glCreateProgram    = (glCreateProgramPROC)wglGetProcAddress("glCreateProgram");
+	glCreateShader     = (glCreateShaderPROC)wglGetProcAddress("glCreateShader");
+	glShaderSource     = (glShaderSourcePROC)wglGetProcAddress("glShaderSource");
+	glCompileShader    = (glCompileShaderPROC)wglGetProcAddress("glCompileShader");
+	glAttachShader     = (glAttachShaderPROC)wglGetProcAddress("glAttachShader");
+	glLinkProgram      = (glLinkProgramPROC)wglGetProcAddress("glLinkProgram");
+	glGetProgramiv     = (glGetProgramivPROC)wglGetProcAddress("glGetProgramiv");
+	glDetachShader     = (glDetachShaderPROC)wglGetProcAddress("glDetachShader");
+	glUseProgram       = (glUseProgramPROC)wglGetProcAddress("glUseProgram");
+	glBindImageTexture = (glBindImageTexturePROC)wglGetProcAddress("glBindImageTexture");
+	glDispatchCompute  = (glDispatchComputePROC)wglGetProcAddress("glDispatchCompute");
+	glDeleteProgram    = (glDeleteProgramPROC)wglGetProcAddress("glDeleteProgram");
+	glDeleteShader     = (glDeleteShaderPROC)wglGetProcAddress("glDeleteShader");
+	glMemoryBarrier    = (glMemoryBarrierPROC)wglGetProcAddress("glMemoryBarrier");
+	glActiveTexture    = (glActiveTexturePROC)wglGetProcAddress("glActiveTexture");
+	glUniform1i        = (glUniform1iPROC)wglGetProcAddress("glUniform1i");
+	glUniform1f        = (glUniform1fPROC)wglGetProcAddress("glUniform1f");
+	glGetUniformLocation = (glGetUniformLocationPROC)wglGetProcAddress("glGetUniformLocation");
+	glTextureStorage2D   = (glTextureStorage2DPROC)wglGetProcAddress("glTextureStorage2D");
+	glCreateTextures     = (glCreateTexturesPROC)wglGetProcAddress("glCreateTextures");
+
+	// These could be separated
+	glCreateMemoryObjectsEXT     = (glCreateMemoryObjectsEXTPROC)wglGetProcAddress("glCreateMemoryObjectsEXT");
+	glDeleteMemoryObjectsEXT     = (glDeleteMemoryObjectsEXTPROC)wglGetProcAddress("glDeleteMemoryObjectsEXT");
+	glTexStorageMem2DEXT         = (glTexStorageMem2DEXTPROC)wglGetProcAddress("glTexStorageMem2DEXT");
+	glTextureStorageMem2DEXT     = (glTextureStorageMem2DEXTPROC)wglGetProcAddress("glTexStorageMem2DEXT");
+	glImportMemoryWin32HandleEXT = (glImportMemoryWin32HandleEXTPROC)wglGetProcAddress("glImportMemoryWin32HandleEXT");
+	glBufferStorageMemEXT        = (glBufferStorageMemEXTPROC)wglGetProcAddress("glBufferStorageMemEXT");
+	glMemoryObjectParameterivEXT = (glMemoryObjectParameterivEXTPROC)wglGetProcAddress("glMemoryObjectParameterivEXT");
+	glGetMemoryObjectParameterivEXT = (glGetMemoryObjectParameterivEXTPROC)wglGetProcAddress("glGetMemoryObjectParameterivEXT");
+
+
+	if(glCreateProgram != NULL
+		&& glCreateShader != NULL
+		&& glShaderSource != NULL
+		&& glCompileShader != NULL
+		&& glAttachShader != NULL
+		&& glLinkProgram != NULL
+		&& glGetProgramiv != NULL
+		&& glDetachShader != NULL
+		&& glUseProgram != NULL
+		&& glBindImageTexture != NULL
+		&& glDispatchCompute != NULL
+		&& glDeleteProgram != NULL
+		&& glActiveTexture != NULL
+		&& glUniform1i != NULL
+		&& glUniform1f != NULL
+		&& glDeleteShader != NULL
+		&& glMemoryBarrier != NULL
+		&& glGetUniformLocation != NULL
+		&& glTextureStorage2D != NULL
+		&& glCreateTextures != NULL
+		// For testing - could be separated
+		&& glCreateMemoryObjectsEXT != NULL
+		&& glDeleteMemoryObjectsEXT != NULL
+		&& glTexStorageMem2DEXT != NULL
+		&& glTextureStorageMem2DEXT != NULL
+		&& glImportMemoryWin32HandleEXT != NULL
+		&& glBufferStorageMemEXT != NULL
+		&& glMemoryObjectParameterivEXT != NULL
+		&& glGetMemoryObjectParameterivEXT != NULL) {
+			return true;
+	}
+	else {
+		printf("loadComputeShaderExtensions failed\n");
+		return false;
+	}
+#endif
+
+#else
+	// Compute shader extensions defined elsewhere
+	return true;
+#endif
+
+}
 
 bool loadContextExtension()
 {
@@ -510,6 +652,13 @@ unsigned int loadGLextensions() {
 		ExtLog(SPOUT_EXT_LOG_WARNING, "loadGLextensions : loadCopyExtensions fail");
 	}
 
+	if (loadComputeShaderExtensions()) {
+		caps |= GLEXT_SUPPORT_COMPUTE;
+	}
+	else {
+		ExtLog(SPOUT_EXT_LOG_WARNING, "loadGLextensions : loadComputeShaderExtensions fail");
+	}
+
 	if (loadContextExtension()) {
 		caps |= GLEXT_SUPPORT_CONTEXT;
 	}
@@ -611,6 +760,7 @@ bool isExtensionSupported(const char *extension)
 
 }
 
+
 void ExtLog(ExtLogLevel level, const char* format, ...)
 {
 	va_list args;
@@ -622,13 +772,13 @@ void ExtLog(ExtLogLevel level, const char* format, ...)
 	std::string logstring;
 	logstring = "SpoutGLextensions : ";
 	switch (level) {
-		case LOG_NOTICE:
+		case SPOUT_EXT_LOG_NOTICE:
 			logstring += "Notice - ";
 			break;
-		case LOG_WARNING:
+		case SPOUT_EXT_LOG_WARNING:
 			logstring += "Warning - ";
 			break;
-		case LOG_ERROR:
+		case SPOUT_EXT_LOG_ERROR:
 			logstring += "Error - ";
 			break;
 		default:
@@ -638,7 +788,7 @@ void ExtLog(ExtLogLevel level, const char* format, ...)
 	printf("%s\n", currentLog);
 	// Note that this will not be recorded in a Spout log file.
 #else
-	_doLog(static_cast<SpoutLogLevel>(level), format, args); // SpoutUtils function
+	_doLog(static_cast<spoututils::SpoutLogLevel>(level), format, args); // SpoutUtils function
 #endif
 
 	va_end(args);

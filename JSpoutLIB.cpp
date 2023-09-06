@@ -160,8 +160,10 @@
 		26.12.22 - Update SpoutGL and SpoutControls files 
 		06.01.23 - Update SpoutGL to 2.007.009
 				   Rebuild x86/x64 - VS2022 /MT
-
-
+		22.07.23 - Update SpoutGL to 2.007.011
+				   Rebuild x86/x64 - VS2022 /MT
+		06.09.23 - Update SpoutGL to 2.007.012
+				   Rebuild x86/x64 - VS2022 /MT
 */
 #include "malloc.h"
 #include <direct.h>

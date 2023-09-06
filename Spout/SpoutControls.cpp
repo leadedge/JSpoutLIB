@@ -46,7 +46,9 @@
 //		03.01.19	- Changed to revised registry functions in SpoutUtils
 //		28.04.19	- Rebuild VS2017 - 2.007 - /MT
 //		27.12.20	- Remove from Spout SDK and use for Processing library
-//					  Rebuild Win32/x64 - /MT : VS2017 - 2.007
+//		18.12.22	- Catch any exception by using Cleanup in destructor
+//		18.12.22	- Use fixed size instead of array with fixed size for GlobalAlloc in ReadMail
+//					  TODO Rebuild Win32/x64 - /MT : VS2017 - 2.007
 //		
 //
 // ====================================================================================
@@ -83,7 +85,12 @@ SpoutControls::SpoutControls()
 //---------------------------------------------------------
 SpoutControls::~SpoutControls()
 {
-	Cleanup();
+	try {
+		Cleanup();
+	}
+	catch (...) {
+		MessageBoxA(NULL, "Exception in SpoutControls destructor", NULL, MB_OK);
+	}
 }
 
 
@@ -153,7 +160,7 @@ bool SpoutControls::CreateControls(std::string mapname, std::vector<control> con
 	// Create or open the shared memory map
 	m_hSharedMemory = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, m_dwSize, (LPCSTR)sharedMemoryName.c_str());
 	if (m_hSharedMemory == NULL || m_hSharedMemory == INVALID_HANDLE_VALUE) { 
-		printf("CreateControls : error occured while creating file mapping object : %d\n", GetLastError() );
+		printf("CreateControls : error occured while creating file mapping object : %u\n", GetLastError() );
 		CloseHandle(m_hAccessMutex);
 		return false;
 	}
@@ -162,7 +169,7 @@ bool SpoutControls::CreateControls(std::string mapname, std::vector<control> con
 	// Map a view to get a pointer to write to
 	m_pBuffer = (LPTSTR)MapViewOfFile(m_hSharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, m_dwSize);
 	if (m_pBuffer == NULL) { 
-		printf("CreateControls : error occured while mapping view of the file : %d\n", GetLastError() );
+		printf("CreateControls : error occured while mapping view of the file : %u\n", GetLastError() );
 		CloseHandle(m_hSharedMemory);
 		CloseHandle(m_hAccessMutex);
 		return false;
@@ -205,10 +212,9 @@ bool SpoutControls::UpdateControls(std::vector<control> controls)
 	HANDLE hMemory = NULL; // local handle to shared memory
 	LPTSTR pBuf = NULL; // local shared memory pointer
 	HANDLE hAccessMutex = NULL;
-	DWORD dwWaitResult;
+	DWORD dwWaitResult = 0;
 	DWORD dwMapSize = 0;
-	char *buf = NULL;
-	char temp[256];
+	char temp[256]{};
 
 	//
 	// Controller writes to the memory map to update control data
@@ -221,7 +227,6 @@ bool SpoutControls::UpdateControls(std::vector<control> controls)
 	hAccessMutex = OpenMutexA(MUTEX_ALL_ACCESS, 0, mutexName.c_str());
 	if(!hAccessMutex) {
 		printf("UpdateControls - access mutex does not exist\n");
-		CloseHandle(hAccessMutex);
 		return false;
 	}
 
@@ -243,14 +248,14 @@ bool SpoutControls::UpdateControls(std::vector<control> controls)
 	// is the first 4 bytes of the map, so read that first to get the size
 	hMemory = CreateFileMappingA ( INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, 4, (LPCSTR)memoryMapName.c_str());
 	if (hMemory == NULL || hMemory == INVALID_HANDLE_VALUE) { 
-		printf("UpdateControls : Error occured while opening file mapping object : %d\n", GetLastError() );
+		printf("UpdateControls : Error occured while opening file mapping object : %u\n", GetLastError() );
 		CloseHandle(hAccessMutex);
 		return false;
 	}
 
 	pBuf = (LPTSTR)MapViewOfFile(hMemory, FILE_MAP_ALL_ACCESS, 0, 0, 4); // only 4 bytes to read
-	if (pBuf == NULL || pBuf[0] == 0) { 
-		printf("UpdateControls : Error 1 occured while mapping view of the file : %d\n", GetLastError() );
+	if (!pBuf || !*pBuf) { 
+		printf("UpdateControls : Error 1 occured while mapping view of the file : %u\n", GetLastError() );
 		if(pBuf) UnmapViewOfFile(pBuf);
 		CloseHandle(hMemory);
 		CloseHandle(hAccessMutex);
@@ -258,7 +263,8 @@ bool SpoutControls::UpdateControls(std::vector<control> controls)
 	}
 
 	// Retrieve the map size - the first 4 bytes
-	buf = (char *)pBuf; // moveable pointer
+	char* buf = (char *)pBuf; // moveable pointer
+	if (!buf) return false;
 	for(int i = 0; i<4; i++)
 		temp[i] = *buf++;
 	temp[4] = 0;
@@ -287,7 +293,7 @@ bool SpoutControls::UpdateControls(std::vector<control> controls)
 
 	pBuf = (LPTSTR)MapViewOfFile(hMemory, FILE_MAP_ALL_ACCESS, 0, 0, dwMapSize);
 	if (pBuf == NULL) { 
-		printf("UpdateControls : Error 2 occured while mapping view of the file : %d\n", GetLastError() );
+		printf("UpdateControls : Error 2 occured while mapping view of the file : %u\n", GetLastError() );
 		CloseHandle(hMemory);
 		CloseHandle(hAccessMutex);
 		return false;
@@ -316,14 +322,13 @@ bool SpoutControls::GetControls(std::vector<control> &controls)
 	HANDLE hMemory = NULL; // local handle to shared memory
 	LPTSTR pBuf = NULL; // local shared memory pointer
 	HANDLE hAccessMutex = NULL;
-	DWORD dwWaitResult;
+	DWORD dwWaitResult = 0;
 	DWORD dwMapSize = 0;
 	// int nControls = 0;
 	// int ControlType = 0;
 	// float ControlValue = 0; // Float value of a control
 	std::string ControlText; // Text data of a control
-	char *buf = NULL;
-	char temp[256];
+	char temp[256]{};
 
 	//
 	// Reader reads the memory map to retrieve control data
@@ -335,8 +340,6 @@ bool SpoutControls::GetControls(std::vector<control> &controls)
 	mutexName += "_mutex";
 	hAccessMutex = OpenMutexA(MUTEX_ALL_ACCESS, 0, mutexName.c_str());
 	if(!hAccessMutex) {
-		printf("GetControls : No access mutex\n");
-		CloseHandle(hAccessMutex);
 		return false;
 	}
 
@@ -358,7 +361,7 @@ bool SpoutControls::GetControls(std::vector<control> &controls)
 	// first 4 bytes of the map so read that first to get the size
 	hMemory = CreateFileMappingA ( INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, 4, (LPCSTR)memoryMapName.c_str());
 	if (hMemory == NULL || hMemory == INVALID_HANDLE_VALUE) { 
-		printf("GetControls - Error occured opening file mapping object : %d\n", GetLastError() );
+		printf("GetControls - Error occured opening file mapping object : %u\n", GetLastError() );
 		ReleaseMutex(hAccessMutex);
 		CloseHandle(hAccessMutex);
 		return false;
@@ -367,7 +370,7 @@ bool SpoutControls::GetControls(std::vector<control> &controls)
 	pBuf = (LPTSTR)MapViewOfFile(hMemory, FILE_MAP_ALL_ACCESS, 0, 0, 4); // only 4 bytes to read
 	// Did the mapping fail or is there nothing in the map
 	if (pBuf == NULL || pBuf[0] == 0) { 
-		printf("GetControls - Error 1 occured while mapping view of the file : %d\n", GetLastError() );
+		printf("GetControls - Error 1 occured while mapping view of the file : %u\n", GetLastError() );
 		if(pBuf) UnmapViewOfFile(pBuf);
 		CloseHandle(hMemory);
 		ReleaseMutex(hAccessMutex);
@@ -376,7 +379,8 @@ bool SpoutControls::GetControls(std::vector<control> &controls)
 	}
 
 	// Retrieve the map size - the first 4 bytes
-	buf = (char *)pBuf; // moveable pointer
+	char* buf = (char *)pBuf; // moveable pointer
+	if (!buf) return false;
 	for(int i = 0; i<4; i++)
 		temp[i] = *buf++;
 	temp[4] = 0;
@@ -396,7 +400,7 @@ bool SpoutControls::GetControls(std::vector<control> &controls)
 
 	pBuf = (LPTSTR)MapViewOfFile(hMemory, FILE_MAP_ALL_ACCESS, 0, 0, dwMapSize);
 	if (pBuf == NULL) { 
-		printf("GetControls - Error 2 occured while mapping view of the file : %d\n", GetLastError() );
+		printf("GetControls - Error 2 occured while mapping view of the file : %u\n", GetLastError() );
 		CloseHandle(hMemory);
 		ReleaseMutex(hAccessMutex);
 		CloseHandle(hAccessMutex);
@@ -432,8 +436,8 @@ bool SpoutControls::GetControls(std::vector<control> &controls)
 // The sender provides the map name, creates the mailslot and writes the map name to the registry
 bool SpoutControls::OpenControls(std::string mapname)
 {
-	char Path[MAX_PATH];
-	HRESULT hr;
+	char Path[MAX_PATH]{};
+	HRESULT hr = 0;
 	Path[0] = 0;
 
 	// 13.12.17 - return if no controls
@@ -524,8 +528,8 @@ bool SpoutControls::CloseControls()
 // or a SpoutControls installation
 bool SpoutControls::OpenSpoutController(std::string CommandLine)
 {
-	char Path[MAX_PATH];
-	char InstallPath[MAX_PATH];
+	char Path[MAX_PATH]{};
+	char InstallPath[MAX_PATH]{};
 	// HRESULT hr;
 	Path[0] = 0;
 	InstallPath[0] = 0;
@@ -654,7 +658,7 @@ bool SpoutControls::FindControlFile(std::string &filepath)
 //---------------------------------------------------------
 // Used by a multiple controlled senders to copy the control
 // file from ProgramData to the local dll directory
-bool SpoutControls::CopyControlFile (std::string &filepath, std::string &destpath)
+bool SpoutControls::CopyControlFile (const std::string &filepath, std::string &destpath)
 {
 	// copy from source to destination
 	if(CopyFileA((LPCSTR)filepath.c_str(), (LPCSTR)destpath.c_str(), false)) {
@@ -719,10 +723,10 @@ bool SpoutControls::CreateFileControl(std::string name, std::string type, float 
 bool SpoutControls::CreateControlFile(const char *filepath)
 {
 	std::string linestring;
-	char path[MAX_PATH];
-	char temp[256];
+	char path[MAX_PATH]{};
+	char temp[256]{};
 
-	if(!filepath[0] || filecontrols.empty())
+	if(!filepath || filecontrols.empty())
 		return false;
 
 	strcpy_s(path, MAX_PATH, filepath);
@@ -847,27 +851,27 @@ bool SpoutControls::WriteControls(void *pBuffer, std::vector<control> controls)
 	//		The writer knows the memory map size to open it (m_dwSize)
 	//
 	float fValue = 0;
-	char desc[256];
-	char *buffer = NULL; // the buffer to store in shared memory
-	char *buf = NULL; // pointer within the buffer
-	int i, j;
+	char desc[256]{};
+	int i = 0;
+	int j = 0;
 
-	buffer = (char *)malloc(m_dwSize*sizeof(unsigned char));
-	if(!buffer) return false;
+	// the buffer to store in shared memory
+	char* buffer = (char *)malloc(m_dwSize*sizeof(unsigned char));
+	char* buf = buffer; // pointer within the buffer
+	if (!buf) return false;
 
 	// Clear the buffer to zero so that there is a null for each data line
 	ZeroMemory(buffer, m_dwSize*sizeof(unsigned char));
-	buf = buffer; // pointer within the buffer
 
 	// The first 4 bytes of the first line is the memory map size so the reader knows how big it is
 	// printf("Writing the memory map size (%d)\n", m_dwSize);
-	sprintf_s(desc, 256, "%4d", m_dwSize);
+	sprintf_s(desc, 256, "%4u", m_dwSize);
 	for(i = 0 ; i< 4; i++) 
 		*buf++ = desc[i];
 
 	// The next 4 bytes contains the number of controls
 	ZeroMemory(desc, 256);
-	sprintf_s(desc, 256, "%4d", (DWORD)controls.size());
+	sprintf_s(desc, 256, "%4u", (DWORD)controls.size());
 	for(i = 0 ; i< 4; i++) 
 		*buf++ = desc[i];
 
@@ -887,7 +891,7 @@ bool SpoutControls::WriteControls(void *pBuffer, std::vector<control> controls)
 
 		// Control type - 4 bytes
 		ZeroMemory(desc, 256);
-		sprintf_s(desc, 256, "%4d", (DWORD)controls.at(i).type);
+		sprintf_s(desc, 256, "%4u", (DWORD)controls.at(i).type);
 		for(j = 0 ; j<4; j++)
 			*buf++ = desc[j];
 
@@ -923,15 +927,17 @@ bool SpoutControls::WriteControls(void *pBuffer, std::vector<control> controls)
 // Read controls from the memory map
 bool SpoutControls::ReadControls(void *pBuffer, std::vector<control> &controls)
 {
-	char *buf = NULL;
-	char temp[256];
-	int i, j, nControls;
-	control control;
+	char temp[256]{};
+	int i = 0;
+	int j = 0;
+	int nControls = 0;
+	control control{};
 
 	//
 	// Get the controls
 	//
-	buf = (char *)pBuffer; // moveable pointer
+	char* buf = (char *)pBuffer; // moveable pointer
+	if (!buf) return false;
 	buf += 4; // The first 4 bytes of the first line is the memory map size, so skip that
 
 	// the next 4 bytes contains the number of controls
@@ -1068,9 +1074,9 @@ bool SpoutControls::CreateMail(std::string SlotName, HANDLE &hSlot)
 bool SpoutControls::WriteMail(std::string SlotName, std::string SlotMessage)
 {
 	std::string slotstring;
-	HANDLE hFile; 
-	BOOL fResult; 
-	DWORD dwWritten; 
+	HANDLE hFile = NULL; 
+	BOOL fResult = 0; 
+	DWORD dwWritten = 0; 
 
 	slotstring = "\\\\.\\mailslot\\";
 	slotstring += SlotName;
@@ -1125,13 +1131,14 @@ bool SpoutControls::CheckMail(std::string SlotName, HANDLE hSlot)
 // a message is ready and clears pending messages
 bool SpoutControls::ReadMail(std::string SlotName, HANDLE hSlot, std::string &SlotMessage)
 {
-	DWORD cbMessage, cMessage, cbRead; 
-	BOOL fResult; 
-	LPTSTR lpszBuffer; 
-	char achID[80];
-	DWORD cAllMessages; 
-	HANDLE hEvent;
-	OVERLAPPED ov;
+	DWORD cbMessage = 0;
+	DWORD cMessage = 0;
+	DWORD cbRead = 0;
+	BOOL fResult = false; 
+	LPTSTR lpszBuffer = nullptr; 
+	DWORD cAllMessages = 0;;
+	HANDLE hEvent = NULL;
+	OVERLAPPED ov{};
  
 	if(hSlot == NULL)
 		return false;
@@ -1170,10 +1177,8 @@ bool SpoutControls::ReadMail(std::string SlotName, HANDLE hSlot, std::string &Sl
 
 		// Allocate memory for the message. 
 		// TODO - clean up
-		lpszBuffer = (LPTSTR) GlobalAlloc(GPTR, lstrlen((LPTSTR)achID)*sizeof(TCHAR) + cbMessage); 
+		lpszBuffer = (LPTSTR) GlobalAlloc(GPTR, 80*sizeof(TCHAR)+cbMessage);
 		if( NULL == lpszBuffer ) return false;
-		lpszBuffer[0] = '\0'; 
- 
 		fResult = ReadFile(	hSlot, 
 							lpszBuffer, 
 							cbMessage, 

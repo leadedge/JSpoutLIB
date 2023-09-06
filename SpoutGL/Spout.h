@@ -48,13 +48,10 @@ class SPOUT_DLLEXP Spout : public spoutGL {
 	// Set name for sender creation
 	//   If no name is specified, the executable name is used  
 	void SetSenderName(const char* sendername = nullptr);
-
-	// Set the sender DX11 shared texture format
+	// Set sender DX11 shared texture format
 	void SetSenderFormat(DWORD dwFormat);
-	
 	// Release sender and resources
 	void ReleaseSender();
-
 	// Send OpenGL framebuffer
 	//   The fbo must be bound for read.
 	//   The sending texture can be larger than the size that the sender is set up for
@@ -160,7 +157,11 @@ class SPOUT_DLLEXP Spout : public spoutGL {
 	void SetFrameSync(const char* SenderName);
 	// Wait or test for a sync event
 	bool WaitFrameSync(const char *SenderName, DWORD dwTimeout = 0);
-	
+	// Enable / disable frame sync
+	void EnableFrameSync(bool bSync = true);
+	// Check for frame sync option
+	bool IsFrameSyncEnabled();
+
 	//
 	// Sender names
 	//
@@ -220,7 +221,7 @@ class SPOUT_DLLEXP Spout : public spoutGL {
 	bool GetAdapterInfo(char* renderadapter,
 		char* renderdescription, char* renderversion,
 		char* displaydescription, char* displayversion,
-		int maxsize, const bool bUseDX9 = false);
+		int maxsize);
 
 	// Create a sender
 	bool CreateSender(const char *Sendername, unsigned int width = 0, unsigned int height = 0, DWORD dwFormat = 0);
@@ -232,7 +233,7 @@ class SPOUT_DLLEXP Spout : public spoutGL {
 	//
 
 	// Create receiver connection
-	bool CreateReceiver(char* Sendername, unsigned int &width, unsigned int &height, bool bUseActive = false);
+	bool CreateReceiver(char* Sendername, unsigned int &width, unsigned int &height);
 	// Check receiver connection
 	bool CheckReceiver(char* Sendername, unsigned int &width, unsigned int &height, bool &bConnected);
 	// Receive OpenGL texture
@@ -253,7 +254,6 @@ class SPOUT_DLLEXP Spout : public spoutGL {
 	// Render a texture to the shared texture. 
 	bool DrawToSharedTexture(GLuint TextureID, GLuint TextureTarget, unsigned int width, unsigned int height, float max_x = 1.0, float max_y = 1.0, float aspect = 1.0, bool bInvert = false, GLuint HostFBO = 0);
 #endif // #endif legacyOpenGL
-
 
 
 protected:
