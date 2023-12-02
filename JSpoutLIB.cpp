@@ -163,7 +163,11 @@
 		22.07.23 - Update SpoutGL to 2.007.011
 				   Rebuild x86/x64 - VS2022 /MT
 		06.09.23 - Update SpoutGL to 2.007.012
-				   Rebuild x86/x64 - VS2022 /MT
+		28.11.23   Remove #define USE_COMPUTE_EXTENSIONS from SpoutGLextensions
+				   For JNISpout library build
+		02.12.23 - Rebuild Spout SDK Version 2.007.013
+				   x86/x64 - VS2022 /MT
+
 */
 #include "malloc.h"
 #include <direct.h>
@@ -1146,6 +1150,7 @@ JNIEXPORT jboolean JNICALL Java_spout_JNISpout_receiveTexture
 
 	Spout * spout = (Spout *)ptr;
 		
+	// Initialized by CreateReceiver
 	if (!spout->IsSpoutInitialized()) {
 		return false;
 	}
@@ -1166,6 +1171,7 @@ JNIEXPORT jboolean JNICALL Java_spout_JNISpout_receiveTexture
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &previousFBO);
 
 		// Retrieve the shared texture into the passed texture
+		// sendername is retreived if initialized
 		if (spout->GetSenderName()) {
 
 			strcpy_s(sendername, 256, spout->GetSenderName());
@@ -1177,6 +1183,7 @@ JNIEXPORT jboolean JNICALL Java_spout_JNISpout_receiveTexture
 				dim[1] = (jint)height;
 				bRet = true;
 			}
+
 		}
 	}
 
@@ -1300,9 +1307,6 @@ JNIEXPORT jint JNICALL Java_spout_JNISpout_getSenderWidth(JNIEnv *env, jclass c,
 	UNREFERENCED_PARAMETER(env);
 
 	unsigned int width = 0;
-	// unsigned int height = 0;
-	// DWORD dwFormat = 0;
-	// HANDLE dxShareHandle = 0;
 	Spout * spout = (Spout *)ptr;
 	if (spout->GetSenderCount() > 0) {
 		width = spout->GetSenderWidth();
@@ -1316,15 +1320,50 @@ JNIEXPORT jint JNICALL Java_spout_JNISpout_getSenderHeight(JNIEnv *env, jclass c
 	UNREFERENCED_PARAMETER(c);
 	UNREFERENCED_PARAMETER(env);
 
-	// unsigned int width = 0;
 	unsigned int height = 0;
-	// DWORD dwFormat = 0;
-	// HANDLE dxShareHandle = 0;
 	Spout * spout = (Spout *)ptr;
 	if (spout->GetSenderCount() > 0) {
 		height = spout->GetSenderHeight();
 	}
 	return height;
+}
+
+// Get sender OpenGL format
+JNIEXPORT jint JNICALL Java_spout_JNISpout_getSenderFormat(JNIEnv* env, jclass c, jlong ptr)
+{
+	UNREFERENCED_PARAMETER(c);
+	UNREFERENCED_PARAMETER(env);
+
+	Spout* spout = (Spout*)ptr;
+	// Luint textureid = spout->GetSharedTextureID();
+
+	DXGI_FORMAT dxformat = spout->GetDX11format();
+	
+	// char tmp[MAX_PATH]{};
+	// sprintf_s(tmp, MAX_PATH, "dxformat = 0x%X\n", dxformat);
+	// SpoutMessageBox(tmp);
+
+	// SpoutLog("textureid = %d (target 0x%X)\n", textureid, GL_TEXTURE_2D);
+	GLint glformat = spout->GLDXformat(dxformat);
+	// SpoutLog("glformat = 0x%X\n", glformat);
+
+	// sprintf_s(tmp, MAX_PATH, "glformat = 0x%X\n", glformat);
+	// SpoutMessageBox(tmp);
+
+	return glformat;
+}
+
+// Get sender OpenGL format name
+JNIEXPORT jstring JNICALL Java_spout_JNISpout_getSenderFormatName(JNIEnv* env, jclass c, jlong ptr)
+{
+	UNREFERENCED_PARAMETER(c);
+
+	Spout* spout = (Spout*)ptr;
+	GLint format = spout->GLDXformat();
+	std::string name = spout->GLformatName(format);
+	jstring jstrName = env->NewStringUTF(name.c_str());
+
+	return jstrName;
 }
 
 // Return Sender fps
@@ -1589,6 +1628,25 @@ JNIEXPORT void JNICALL Java_spout_JNISpout_spoutLogFatal
 	env->ReleaseStringUTFChars(logtext, nativestring);
 }
 
+
+JNIEXPORT jboolean JNICALL Java_spout_JNISpout_copyToClipBoard
+(JNIEnv* env, jclass c, jstring text, jlong ptr)
+{
+	UNREFERENCED_PARAMETER(c);
+	UNREFERENCED_PARAMETER(ptr);
+
+	char copytext[MAX_PATH]{};
+	jboolean isCopy = JNI_FALSE;
+	const char* nativestring = env->GetStringUTFChars(text, &isCopy);
+	if (nativestring[0]) strcpy_s(copytext, MAX_PATH, nativestring);
+
+	bool bret = CopyToClipBoard(NULL, copytext);
+
+	env->ReleaseStringUTFChars(text, nativestring);
+
+	return bret;
+
+}
 
 
 // =================================================================== //

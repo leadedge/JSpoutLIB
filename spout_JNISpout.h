@@ -129,6 +129,22 @@ JNIEXPORT jint JNICALL Java_spout_JNISpout_getSenderHeight
 
 /*
  * Class:     spout_JNISpout
+ * Method:    getSenderFormat
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_spout_JNISpout_getSenderFormat
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     spout_JNISpout
+ * Method:    getSenderFormatName
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_spout_JNISpout_getSenderFormatName
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     spout_JNISpout
  * Method:    getSenderFps
  * Signature: (J)F
  */
@@ -229,6 +245,14 @@ JNIEXPORT void JNICALL Java_spout_JNISpout_spoutLogError
  * Signature: (Ljava/lang/String;J)V
  */
 JNIEXPORT void JNICALL Java_spout_JNISpout_spoutLogFatal
+  (JNIEnv *, jclass, jstring, jlong);
+
+/*
+ * Class:     spout_JNISpout
+ * Method:    copyToClipBoard
+ * Signature: (Ljava/lang/String;J)Z
+ */
+JNIEXPORT jboolean JNICALL Java_spout_JNISpout_copyToClipBoard
   (JNIEnv *, jclass, jstring, jlong);
 
 /*
