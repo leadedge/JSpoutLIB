@@ -165,8 +165,19 @@
 		06.09.23 - Update SpoutGL to 2.007.012
 		28.11.23   Remove #define USE_COMPUTE_EXTENSIONS from SpoutGLextensions
 				   For JNISpout library build
-		02.12.23 - Rebuild Spout SDK Version 2.007.013
-				   x86/x64 - VS2022 /MT
+		09.12.23 - Rebuild Spout SDK Version 2.007.013 / Openframeworks 12.0
+				   x86/x64 - VS2022 /MT 
+				   Processing 2.0.7.8 (Version 10) maintenance release
+		21.12.23 - Update SpoutGL to 2.007.013
+				   Rebuild x86/x64 - VS2022 /MT
+
+
+
+		==============================================================
+		Remove #define USE_COMPUTE_EXTENSIONS from SpoutGLextensions.h
+		For JNISpout library build
+		==============================================================
+
 
 */
 #include "malloc.h"
@@ -256,7 +267,7 @@ JNIEXPORT jlong JNICALL Java_spout_JNISpout_init
     Spout * spout = new Spout;
     
 	ptr = (jlong)spout;
-   
+
 	return ptr;    
 }
 
